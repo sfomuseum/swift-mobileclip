@@ -14,16 +14,32 @@ let package = Package(
             name: "MobileCLIP",
             targets: ["MobileCLIP"]
         ),
+        .executable(
+            name: "embeddings",
+            targets: [
+                "Embeddings"
+            ])
     ],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.0"),
+        .package(url: "https://github.com/apple/swift-log", from: "1.6.4")
+      ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "MobileCLIP"
         ),
-        .testTarget(
-            name: "MobileCLIPTests",
-            dependencies: ["MobileCLIP"]
+        .executableTarget(
+            name: "Embeddings",
+            dependencies: [
+                "MobileCLIP",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "Logging", package: "swift-log"),
+            ],
+            resources: [
+                .copy("../MobileCLIP/Models")
+            ]
         ),
     ]
 )
