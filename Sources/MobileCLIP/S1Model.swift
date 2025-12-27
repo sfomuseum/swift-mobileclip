@@ -3,6 +3,7 @@ import Foundation
 
 public struct S1Model: CLIPEncoder {
 
+
     /*
     let imageEncoder = AsyncFactory {
         do {

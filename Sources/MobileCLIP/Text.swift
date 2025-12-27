@@ -1,9 +1,10 @@
 import Foundation
 import CoreML
 
-// Compute Text Embeddings
 public func ComputeTextEmbeddings(model: CLIPEncoder, tokenizer: CLIPTokenizer, promptArr: [String]) async -> [MLMultiArray] {
+
     var textEmbeddings: [MLMultiArray] = []
+
     do {
         for singlePrompt in promptArr {
             print("")

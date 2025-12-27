@@ -3,6 +3,7 @@ import Foundation
 
 public struct BLTModel: CLIPEncoder {
 
+
     /*
     let imageEncoder = AsyncFactory {
         do {

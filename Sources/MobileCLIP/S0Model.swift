@@ -2,52 +2,44 @@ import CoreML
 import Foundation
 
 public struct S0Model: CLIPEncoder {
-
-    /*
-    let imageEncoder = AsyncFactory {
-        do {
-           return try mobileclip_s0_image()
-        } catch {
-            fatalError("Failed to initialize ML model: \(error)")
-        }
-    }
-    
-    
-    let textEncoder = AsyncFactory {
-        do {
-            return try mobileclip_s0_text()
-        } catch {
-            fatalError("Failed to initialize ML model: \(error)")
-        }
-    }
-    
-    
-    func load() async {
-        async let t = textEncoder.get()
-        async let i = imageEncoder.get()
-        _ = await (t, i)
-    }
-    */
     
     public let targetImageSize = CGSize(width: 256, height: 256)
-
+    
+    private var text_model: mobileclip_s0_text?
+    private var image_model: mobileclip_s0_image?
+    
+    public init() throws  {
+        
+        do {
+            text_model = try mobileclip_s0_text()
+            image_model = try mobileclip_s0_image()
+        } catch {
+            throw error
+        }
+    }
+    
     public func encode(image: CVPixelBuffer) async -> Result<MLMultiArray, Error> {
         do {
             
-            // let rsp = try await imageEncoder.get().prediction(image: image).final_emb_1
-            let enc = try mobileclip_s0_image()
-            let rsp = try enc.prediction(image: image).final_emb_1
+            guard let model = self.image_model else {
+                throw CLIPEncoderError.missingModel
+            }
+            
+            let rsp = try model.prediction(image: image).final_emb_1
             return .success(rsp)
         } catch {
             return .failure(error)
         }
     }
-
+    
     public func encode(text: MLMultiArray) async  -> Result<MLMultiArray, Error> {
         do {
-            // let rsp = try await textEncoder.get().prediction(text: text).final_emb_1
-            let enc = try mobileclip_s0_text()
-            let rsp = try enc.prediction(text: text).final_emb_1
+            
+            guard let model = self.text_model else {
+                throw CLIPEncoderError.missingModel
+            }
+            
+            let rsp = try model.prediction(text: text).final_emb_1
             return .success(rsp)
         } catch {
             return .failure(error)
