@@ -26,6 +26,7 @@ struct Text: AsyncParsableCommand {
             logger.logLevel = .debug
         }
         
+        let tokenizer = CLIPTokenizer()
         var encoder: CLIPEncoder
         
         do {
@@ -33,8 +34,11 @@ struct Text: AsyncParsableCommand {
         } catch {
             throw error
         }
-            
-        print("HI \(encoder)")
+           
+        let input = [ "Hello", "world "]
+        
+        let emb = await ComputeTextEmbeddings(model: encoder, tokenizer: tokenizer, promptArr: input)
+        print("HI \(emb)")
         
     }
 }
