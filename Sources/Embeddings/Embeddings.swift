@@ -5,7 +5,7 @@ import ArgumentParser
 struct Embeddings: AsyncParsableCommand {
   static let configuration = CommandConfiguration(
     commandName: "embeddings",
-    subcommands: [Text.self],
+    subcommands: [Text.self, Image.self ],
     defaultSubcommand: Text.self,
   )
 }

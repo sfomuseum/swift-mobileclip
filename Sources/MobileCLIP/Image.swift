@@ -2,8 +2,9 @@ import Foundation
 import CoreML
 
 // Compute Image Embeddings
-func computeImageEmbeddings(model: CLIPEncoder, frame: CVPixelBuffer) async throws -> MLMultiArray {
-    // prepare the image
+public func ComputeImageEmbeddings(model: CLIPEncoder, image: CGImage) async throws -> MLMultiArray {
+
+    /*
     var image: CGImage
     
     do {
@@ -11,15 +12,16 @@ func computeImageEmbeddings(model: CLIPEncoder, frame: CVPixelBuffer) async thro
     } catch {
         throw error
     }
+    */
     
-    image = drawSquareFromImage(image)!
+    // var im = drawSquareFromImage(image)!
     
-    image = cgImageResizePreservingAspectRatio(image, toFit: model.targetImageSize)!
+    var im = cgImageResizePreservingAspectRatio(image, toFit: model.targetImageSize)!
     
     let extent = CGRect(x: 0,
                         y: 0,
-                        width: image.width,
-                        height: image.height)
+                        width: im.width,
+                        height: im.height)
 
     
     let pixelFormat = kCVPixelFormatType_32ARGB
@@ -31,7 +33,7 @@ func computeImageEmbeddings(model: CLIPEncoder, frame: CVPixelBuffer) async thro
         fatalError("SAD")
     }
     
-    render(cgImage: image, into: output)
+    render(cgImage: im, into: output)
 
     let rsp = await model.encode(image: output)
     

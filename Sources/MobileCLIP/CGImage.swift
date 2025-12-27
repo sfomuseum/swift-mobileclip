@@ -1,6 +1,7 @@
 import CoreVideo
 import CoreGraphics
 import CoreImage
+import ImageIO
 
 enum PixelBufferConversionError: Error, LocalizedError {
     case lockFailed
@@ -197,4 +198,22 @@ func cgImageResize(
 
     // 4️⃣ Grab the new CGImage from the context
     return ctx.makeImage()
+}
+
+
+
+public func loadCGImage(at path: String) -> CGImage? {
+    let url = URL(fileURLWithPath: path)
+    guard FileManager.default.fileExists(atPath: url.path) else { return nil }
+
+    guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
+
+    // Optionally down‑sample large images:
+    let options: [NSString: Any] = [
+        kCGImageSourceShouldCache: false,
+        kCGImageSourceCreateThumbnailFromImageAlways: true,
+        kCGImageSourceThumbnailMaxPixelSize: 1024   // adjust as needed
+    ]
+
+    return CGImageSourceCreateImageAtIndex(source, 0, options as CFDictionary)
 }
