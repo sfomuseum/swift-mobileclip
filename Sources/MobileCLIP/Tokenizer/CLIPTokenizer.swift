@@ -58,10 +58,7 @@ public class CLIPTokenizer {
     public init() {
 
         let url = Bundle.module.url(forResource: "clip-merges", withExtension: "txt")!
-                
-        // let url = Bundle.main.url(forResource: "clip-merges", withExtension: "txt")!
-        print("URL \(url)")
-        
+                        
         let bpeMergesTxt = try! String(contentsOf: url)
         let arr = bpeMergesTxt.split(separator: "\n").map { String($0) }
         var bpeRanks: [BytePair: Int] = [:]

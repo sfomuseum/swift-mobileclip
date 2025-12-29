@@ -3,6 +3,12 @@ import CoreGraphics
 import CoreImage
 import ImageIO
 
+enum CGImageError: Error {
+    case notExists
+    case sourceCreate
+    case sourceCreateIndex
+}
+
 enum PixelBufferConversionError: Error, LocalizedError {
     case lockFailed
     case baseAddressNil
@@ -250,18 +256,26 @@ func cgImageResize(
 
 
 
-public func loadCGImage(at path: String) -> CGImage? {
+public func loadCGImage(at path: String) throws -> CGImage {
     let url = URL(fileURLWithPath: path)
-    guard FileManager.default.fileExists(atPath: url.path) else { return nil }
+    guard FileManager.default.fileExists(atPath: url.path) else {
+        throw CGImageError.notExists
+    }
 
-    guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
+    guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else {
+        throw CGImageError.sourceCreate
+    }
 
     // Optionally down‑sample large images:
     let options: [NSString: Any] = [
         kCGImageSourceShouldCache: false,
-        kCGImageSourceCreateThumbnailFromImageAlways: true,
-        kCGImageSourceThumbnailMaxPixelSize: 1024   // adjust as needed
+        // kCGImageSourceCreateThumbnailFromImageAlways: true,
+        // kCGImageSourceThumbnailMaxPixelSize: 1024   // adjust as needed
     ]
 
-    return CGImageSourceCreateImageAtIndex(source, 0, options as CFDictionary)
+    guard let im = CGImageSourceCreateImageAtIndex(source, 0, options as CFDictionary) else {
+        throw CGImageError.sourceCreateIndex
+    }
+    
+    return im
 }

@@ -14,16 +14,17 @@ public struct Embeddings: Codable {
 
 }
 
-private func newEmbeddings(encoder: CLIPEncoder, embeddings: MLMultiArray) -> Embeddings {
+private func newEmbeddings(encoder: CLIPEncoder, mlMultiArray: MLMultiArray) -> Embeddings {
     
     let ts = Int64(Date().timeIntervalSince1970)
     
     let emb = Embeddings(
-        embeddings: convertToArray(from: embeddings),
-        dimensions: Int(truncating: embeddings.shape[1]),
+        embeddings: convertToArray(from: mlMultiArray),
+        dimensions: Int(truncating: mlMultiArray.shape[1]),
         model: encoder.model,
         created: ts
     )
+    
     return emb
 }
 
@@ -60,7 +61,7 @@ public func ComputeTextEmbeddings(encoder: CLIPEncoder, tokenizer: CLIPTokenizer
         
         switch rsp {
         case .success(let output):
-            let emb = newEmbeddings(encoder: encoder, embeddings: output)
+            let emb = newEmbeddings(encoder: encoder, mlMultiArray: output)
             return .success(emb)
         case .failure(let error):
             return .failure(error)
@@ -98,7 +99,7 @@ public func ComputeImageEmbeddings(encoder: CLIPEncoder, image: CGImage) async -
     switch rsp {
     case .success(let output):
         
-        let emb = newEmbeddings(encoder: encoder, embeddings: output)
+        let emb = newEmbeddings(encoder: encoder, mlMultiArray: output)
         return .success(emb)
     case .failure(let error):
         return .failure(error)

@@ -1,7 +1,7 @@
 import ArgumentParser
 import Logging
 import MobileCLIP
-
+import CoreGraphics
 
 struct Image: AsyncParsableCommand {
     static let configuration = CommandConfiguration(abstract: "Parse the text of a wall label in to JSON-encoded structured data.")
@@ -23,20 +23,17 @@ struct Image: AsyncParsableCommand {
             logger.logLevel = .debug
         }
         
-        guard let im = loadCGImage(at: path) else {
-            fatalError("SAD")
-        }
-        
+        var im: CGImage
         var encoder: CLIPEncoder
-        
+
         do {
+            im = try loadCGImage(at: path)
             encoder = try NewClipEncoder(uri: encoder_uri)
         } catch {
             throw error
         }
-        
 
-            let rsp =  await ComputeImageEmbeddings(encoder: encoder, image: im)
+        let rsp =  await ComputeImageEmbeddings(encoder: encoder, image: im)
 
         switch rsp {
         case .success(let emb):
