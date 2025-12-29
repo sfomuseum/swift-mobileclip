@@ -35,10 +35,13 @@ struct Image: AsyncParsableCommand {
             throw error
         }
         
-        do {
-            let emb = try await ComputeImageEmbeddings(model: encoder, image: im)
-            print("HI \(emb)")
-        } catch {
+
+            let rsp =  await ComputeImageEmbeddings(encoder: encoder, image: im)
+
+        switch rsp {
+        case .success(let emb):
+            try writeEmbeddingsAsJSON(results: emb)
+        case .failure(let error):
             throw error
         }
     }

@@ -4,6 +4,7 @@ import Foundation
 public struct S0Model: CLIPEncoder {
     
     public let targetImageSize = CGSize(width: 256, height: 256)
+    public let model = String("apple/mobileclip_s0")
     
     private var text_model: mobileclip_s0_text?
     private var image_model: mobileclip_s0_image?

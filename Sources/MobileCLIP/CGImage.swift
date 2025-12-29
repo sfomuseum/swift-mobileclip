@@ -29,6 +29,54 @@ enum PixelBufferConversionError: Error, LocalizedError {
     }
 }
 
+func render(
+    cgImage: CGImage,
+    into pixelBuffer: CVPixelBuffer,
+    colorSpace: CGColorSpace? = nil,
+    interpolationQuality: CGInterpolationQuality = .high
+) -> Bool {
+
+    // 1️⃣ Lock the buffer for writing
+    guard kCVReturnSuccess == CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly) else {
+        return false
+    }
+    defer { CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly) }
+
+    // 2️⃣ Gather buffer info
+    let width  = CVPixelBufferGetWidth(pixelBuffer)
+    let height = CVPixelBufferGetHeight(pixelBuffer)
+    let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
+
+    guard let baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer) else {
+        return false
+    }
+
+    // 3️⃣ Determine the color space to use
+    let cs = colorSpace ?? cgImage.colorSpace ?? CGColorSpaceCreateDeviceRGB()
+
+    // 4️⃣ Create a CGContext that writes directly into the pixel buffer
+    guard let ctx = CGContext(
+        data: baseAddress,
+        width: width,
+        height: height,
+        bitsPerComponent: 8,
+        bytesPerRow: bytesPerRow,
+        space: cs,
+        bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue
+    ) else {
+        return false
+    }
+
+    // 5️⃣ Set interpolation quality
+    ctx.interpolationQuality = interpolationQuality
+
+    // 6️⃣ Draw the image – CoreGraphics will scale it to fill the buffer
+    let destRect = CGRect(x: 0, y: 0, width: width, height: height)
+    ctx.draw(cgImage, in: destRect)
+
+    return true
+}
+
 
 /// Convert a CVPixelBuffer into a CGImage.
 ///

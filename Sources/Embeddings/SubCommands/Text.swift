@@ -1,5 +1,5 @@
 import ArgumentParser
-
+import Foundation
 import Logging
 import MobileCLIP
 
@@ -35,10 +35,16 @@ struct Text: AsyncParsableCommand {
             throw error
         }
            
-        let input = [ "Hello", "world "]
+        let input = "Hello world"
         
-        let emb = await ComputeTextEmbeddings(model: encoder, tokenizer: tokenizer, promptArr: input)
-        print("HI \(emb)")
+        let rsp = await ComputeTextEmbeddings(encoder: encoder, tokenizer: tokenizer, text: input)
+        
+        switch rsp {
+        case .success(let emb):
+            try writeEmbeddingsAsJSON(results: emb)
+        case .failure(let error):
+            throw error
+        }
         
     }
 }
