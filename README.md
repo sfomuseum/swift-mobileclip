@@ -1,5 +1,7 @@
 # swift-mobileclip
 
+Swift package to use the MobileCLIP CoreML models in library code and command line applications.
+
 ## Motivation
 
 This is a refactoring of the code in the example iOS application provided by the [apple/ml-mobileclip](https://github.com/apple/ml-mobileclip/tree/main) package such that it can be used as standalone library code and in command-line applications.
@@ -36,6 +38,14 @@ let encoder = try NewCLIPEncoder(models!)
 _Error handling removed for the sake of brevity._
 
 If you pass in a model URI without specifying a path to a local model directory then the code will assume the models have been embedded as a "resource" in the application's main "Bundle". To be honest, I haven't figured out how to make this work. I am assuming it has something to do with how things are referenced in `Package.swift` but I never manage to compile an executable with the models _bundled_ in to the application itself.
+
+### Model Swift wrappers
+
+Auto-generated Swift code to work with the models is included by default in [Sources/MobileCLIP/Models](Sources/MobileCLIP/Models). If you need or want to recompile that code from the source models the easiest way is to use the handy `generate-all` Makefile target provided by this package. For example:
+
+```
+$> make generate-all SOURCE=/usr/local/data/mobileclip
+```
 
 ## Usage
 
