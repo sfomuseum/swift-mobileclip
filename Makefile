@@ -11,9 +11,9 @@ generate-all:
 	@make generate MODEL=blt
 
 compile:
-	xcrun coremlcompiler compile ~/Desktop/Models/mobileclip_$(MODEL)_image.mlpackage Sources/MobileCLIP/Resources
-	xcrun coremlcompiler compile ~/Desktop/Models/mobileclip_$(MODEL)_text.mlpackage Sources/MobileCLIP/Resources
+	xcrun coremlcompiler compile $(SOURCE)/mobileclip_$(MODEL)_image.mlpackage $(TARGET)
+	xcrun coremlcompiler compile $(SOURCE)/mobileclip_$(MODEL)_text.mlpackage $(TARGET)
 
 generate:
-	xcrun coremlcompiler generate ~/Desktop/Models/mobileclip_$(MODEL)_image.mlpackage Sources/MobileCLIP/Models --language Swift
-	xcrun coremlcompiler generate ~/Desktop/Models/mobileclip_$(MODEL)_text.mlpackage Sources/MobileCLIP/Models --language Swift
+	xcrun coremlcompiler generate $(SOURCE)/mobileclip_$(MODEL)_image.mlpackage Sources/MobileCLIP/Models --language Swift
+	xcrun coremlcompiler generate $(SOURCE)/mobileclip_$(MODEL)_text.mlpackage Sources/MobileCLIP/Models --language Swift

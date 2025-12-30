@@ -22,7 +22,7 @@ struct Text: AsyncParsableCommand {
     
     func run() async throws {
         
-        var logger = Logger(label: "org.sfomuseum.embeddings")
+        var logger = Logger(label: "org.sfomuseum.embeddings.text")
 
         if verbose {
             logger.logLevel = .debug
@@ -34,6 +34,7 @@ struct Text: AsyncParsableCommand {
         do {
             encoder = try NewClipEncoder(uri: encoder_uri)
         } catch {
+            logger.error("Failed to create new encoder, \(error)")
             throw error
         }
            
@@ -60,12 +61,14 @@ struct Text: AsyncParsableCommand {
                 } else {
                                         
                     if isDir.boolValue {
+                        logger.error("Path is a directory")
                         throw TextErrors.isDirectory
                     }
                     
                     do {
                         input = try String(contentsOfFile: args[0], encoding: .utf8)
                     } catch {
+                        logger.error("Failed to read file, \(error)")
                         throw error
                     }
                 }
@@ -86,6 +89,7 @@ struct Text: AsyncParsableCommand {
         case .success(let emb):
             try writeEmbeddingsAsJSON(results: emb)
         case .failure(let error):
+            logger.error("Failed to encode embeddings, \(error)")
             throw error
         }
         

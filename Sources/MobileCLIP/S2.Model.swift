@@ -10,29 +10,31 @@ public struct S2Model: CLIPEncoder {
     private var text_model: mobileclip_s2_text?
     private var image_model: mobileclip_s2_image?
     
-    public init(_ root: String = "") throws  {
+    public init(_ models: URL? = nil) throws  {
         
         do {
             
-            if root != "" {
+            if models != nil {
                 
-                let root_uri = String(format: "file://%@", root)
-                guard var im_model = URL(string: root_uri) else {
-                    print("SAD IM \(root_uri)")
-                    fatalError()
-                }
-           
-                guard var txt_model = URL(string: root_uri) else {
-                    print("SAD TXT")
-                    fatalError()
+                guard var components = URLComponents(url: models!, resolvingAgainstBaseURL: true) else {
+                    throw CLIPEncoderError.invalidComponents
                 }
                 
-                im_model.append(path: "mobileclip_s2_image.mlmodelc")
-                txt_model.append(path: "mobileclip_s2_text.mlmodelc")
+                components.scheme = "file"
+
+                guard var im_url = components.url else {
+                    throw CLIPEncoderError.invalidURI
+                }
                 
-                print("im \(im_model.absoluteString) txt: \(txt_model.absoluteString)")
-                image_model = try mobileclip_s2_image(contentsOf: im_model)
-                text_model = try mobileclip_s2_text(contentsOf: txt_model)
+                guard var txt_url = components.url else {
+                    throw CLIPEncoderError.invalidURI
+                }
+                
+                im_url.append(path: "mobileclip_s2_image.mlmodelc")
+                txt_url.append(path: "mobileclip_s2_text.mlmodelc")
+                
+                image_model = try mobileclip_s2_image(contentsOf: im_url)
+                text_model = try mobileclip_s2_text(contentsOf: txt_url)
                 
             } else {
                 
@@ -49,21 +51,13 @@ public struct S2Model: CLIPEncoder {
     
     public func encode(image: CVPixelBuffer) async -> Result<MLMultiArray, Error> {
 
-        print("OMGWTF 1")
         do {
-            
-            print("OMGWTF 2")
 
             guard let model = self.image_model else {
                 throw CLIPEncoderError.missingModel
             }
             
-            print("OMGWTF 3")
             let rsp = try model.prediction(image: image).final_emb_1
-            
-            print("OMGWTF 4")
-            
-
             return .success (rsp)
         } catch {
             return .failure(error)

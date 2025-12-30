@@ -1,7 +1,6 @@
-import CoreVideo
 import CoreGraphics
 import CoreImage
-import ImageIO
+import Foundation
 
 enum CGImageError: Error {
     case notExists
@@ -19,11 +18,8 @@ public func loadCGImage(at path: String) throws -> CGImage {
         throw CGImageError.sourceCreate
     }
 
-    // Optionally down‑sample large images:
     let options: [NSString: Any] = [
         kCGImageSourceShouldCache: false,
-        // kCGImageSourceCreateThumbnailFromImageAlways: true,
-        // kCGImageSourceThumbnailMaxPixelSize: 1024   // adjust as needed
     ]
 
     guard let im = CGImageSourceCreateImageAtIndex(source, 0, options as CFDictionary) else {

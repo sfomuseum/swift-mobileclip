@@ -3,6 +3,7 @@ import CoreML
 
 public enum CLIPEncoderError: Error {
     case invalidURI
+    case invalidComponents
     case invalidScheme
     case missingModel
 }
@@ -19,18 +20,27 @@ public func NewClipEncoder(uri: String) throws -> CLIPEncoder {
     guard let u = URL(string: uri) else {
         throw CLIPEncoderError.invalidURI
     }
+        
+    var models: URL?
     
-    print("PATH \(u.path)")
+    if u.path != "" {
+
+        guard let m = URL(string: u.path) else {
+            throw CLIPEncoderError.invalidURI
+        }
+        
+        models = m
+    }
     
     switch u.scheme {
     case "s0":
-        return try S0Model()
+        return try S0Model(models)
     case "s1":
-        return try S1Model()
+        return try S1Model(models)
     case "s2":
-        return try S2Model(u.path)
+        return try S2Model(models)
     case "blt":
-        return try BLTModel()
+        return try BLTModel(models)
     default:
         throw CLIPEncoderError.invalidScheme
     }

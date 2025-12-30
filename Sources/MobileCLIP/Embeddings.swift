@@ -78,7 +78,6 @@ public func ComputeImageEmbeddings(encoder: CLIPEncoder, image: CGImage) async -
     
     let sz = encoder.targetImageSize
     guard let im = ImageScaler.scaleToFill(image, in: sz) else {
-        print("SAD IMAGE")
         return .failure(EmbeddingsErrors.imageResizeError)
     }
     

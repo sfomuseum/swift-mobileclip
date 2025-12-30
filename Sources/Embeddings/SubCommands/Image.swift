@@ -17,7 +17,7 @@ struct Image: AsyncParsableCommand {
     
     func run() async throws {
         
-        var logger = Logger(label: "org.sfomuseum.embeddings")
+        var logger = Logger(label: "org.sfomuseum.embeddings.image")
         
         if verbose {
             logger.logLevel = .debug
@@ -27,22 +27,20 @@ struct Image: AsyncParsableCommand {
         var encoder: CLIPEncoder
 
         do {
-            print("IM")
             im = try loadCGImage(at: path)
-            print("ENC")
             encoder = try NewClipEncoder(uri: encoder_uri)
-            print("POO")
         } catch {
+            logger.error("Failed to create new encoder, \(error)")
             throw error
         }
 
-        print("COMPUTE \(encoder) \(im)")
         let rsp =  await ComputeImageEmbeddings(encoder: encoder, image: im)
 
         switch rsp {
         case .success(let emb):
             try writeEmbeddingsAsJSON(results: emb)
         case .failure(let error):
+            logger.error("Failed to encode embeddings, \(error)")
             throw error
         }
     }

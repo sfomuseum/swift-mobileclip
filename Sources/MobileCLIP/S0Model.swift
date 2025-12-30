@@ -9,11 +9,38 @@ public struct S0Model: CLIPEncoder {
     private var text_model: mobileclip_s0_text?
     private var image_model: mobileclip_s0_image?
     
-    public init() throws  {
+    public init(_ models: URL? = nil) throws  {
         
         do {
-            text_model = try mobileclip_s0_text()
-            image_model = try mobileclip_s0_image()
+            
+            if models != nil {
+                
+                guard var components = URLComponents(url: models!, resolvingAgainstBaseURL: true) else {
+                    throw CLIPEncoderError.invalidComponents
+                }
+                
+                components.scheme = "file"
+
+                guard var im_url = components.url else {
+                    throw CLIPEncoderError.invalidURI
+                }
+                
+                guard var txt_url = components.url else {
+                    throw CLIPEncoderError.invalidURI
+                }
+                
+                im_url.append(path: "mobileclip_s0_image.mlmodelc")
+                txt_url.append(path: "mobileclip_s0_text.mlmodelc")
+                
+                image_model = try mobileclip_s0_image(contentsOf: im_url)
+                text_model = try mobileclip_s0_text(contentsOf: txt_url)
+                
+            } else {
+                
+                text_model = try mobileclip_s0_text()
+                image_model = try mobileclip_s0_image()
+            }
+            
         } catch {
             throw error
         }
