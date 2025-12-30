@@ -4,6 +4,77 @@
 
 This is a refactoring of the code in the example iOS application provided by the [apple/ml-mobileclip](https://github.com/apple/ml-mobileclip/tree/main) package such that it can be used as standalone library code and in command-line applications.
 
+Currently this code targets the [apple/coreml-mobileclip](https://huggingface.co/apple/coreml-mobileclip) encoders. [mobileclip2](https://huggingface.co/collections/apple/mobileclip2) support is planned but I haven't gotten around to [figuring out how to do that](https://huggingface.co/blog/fguzman82/frompytorch-to-coreml#case-study-clip-finder-image-encoder-conversion) yet.
+
+## Models
+
+The MobileCLIP models weigh in at about ~750MB so they are NOT bundled with this package. The idea is that you will download them locally to the same host that is running the applications provided by this package.
+
+For example, following the [download instructions](https://huggingface.co/apple/coreml-mobileclip#download) from Apple's HuggingFace account:
+
+```
+$> mkdir -p /usr/local/data/mobileclip
+$> huggingface-cli download --local-dir /usr/local/data/mobileclip apple/coreml-mobileclip
+```
+
+This will store the MobileCLIP `.mlpackage` files in the `/usr/local/data/mobileclip` folder. At this point these files need to be compiled in to `.modelc` files. The easiest way to do this is using the handy `compile-all` Makefile target provided by this package. For example:
+
+```
+$> make complile-all SOURCE=/usr/local/data/mobileclip TARGET=/usr/local/data/mobileclip
+```
+
+To load a specific model compile its URI scheme (`s0`, `s1`, `s2` or `blt`) along with the path to the folder where your models are stored. For example:
+
+```
+import MobileCLIP
+import Foundation
+
+let models = URL(string: "s0:///usr/local/data/mobileclip")
+let encoder = try NewCLIPEncoder(models!)
+```
+
+_Error handling removed for the sake of brevity._
+
+If you pass in a model URI without specifying a path to a local model directory then the code will assume the models have been embedded as a "resource" in the application's main "Bundle". To be honest, I haven't figured out how to make this work. I am assuming it has something to do with how things are referenced in `Package.swift` but I never manage to compile an executable with the models _bundled_ in to the application itself.
+
+## Usage
+
+The easiest way to use this package in library code is to use the public `ComputeTextEmbeddings` and `ComputeImageEmbeddings` methods which have modest signatures:
+
+```
+ComputeTextEmbeddings(encoder: CLIPEncoder, tokenizer: CLIPTokenizer, text: String) async -> Result<Embeddings, Error>
+
+ComputeImageEmbeddings(encoder: CLIPEncoder, image: CGImage) async -> Result<Embeddings, Error>
+```
+
+For example:
+
+```
+import MobileCLIP
+import Foundation
+
+let models = URL(string: "s0:///usr/local/data/mobileclip")
+let encoder = try NewCLIPEncoder(models!)
+let tokenizer = CLIPTokenizer()
+
+let rsp = await ComputeTextEmbeddings(encoder: encoder, tokenizer: tokenizer, text: "Hello world")
+```
+
+_Error handling removed for the sake of brevity._
+
+Both methods return a Swift `Result` instance which, if successful, will yield an `Embeddings` struct:
+
+```
+public struct Embeddings: Codable {
+    var embeddings: [Double] 
+    var dimensions: Int
+    var model: String
+    var type: String
+    var created: Int64
+
+}
+```
+
 ## Tools
 
 ```
@@ -34,7 +105,7 @@ SUBCOMMANDS:
 
 ```
 $> embeddings text --help
-OVERVIEW: Parse the text of a wall label in to JSON-encoded structured data.
+OVERVIEW: Derive vector embeddings for a text.
 
 USAGE: embeddings text [--encoder_uri <encoder_uri>] [--verbose <verbose>] <args> ...
 
@@ -44,7 +115,8 @@ ARGUMENTS:
 
 OPTIONS:
   --encoder_uri <encoder_uri>
-                          The parser scheme is to use for parsing wall label text. (default: s0://)
+                          The URI for MobileCLIP encoder to use. URIs take the form of {SCHEME}://{OPTIONAL_PATH} where {SCHEME} is one of s0,s1,s2 or blt and {OPTIONAL_PATH} is the path to a local
+                          directory containing compiled MobileCLIP CoreML model files. If {OPTIONAL_PATH} is empty then models will loaded from the application's default Bundle. (default: s0://)
   --verbose <verbose>     Enable verbose logging (default: false)
   -h, --help              Show help information.
 ```
@@ -61,14 +133,15 @@ $> echo "foo bar" | ~/Desktop/embeddings text --encoder_uri=blt:///Users/asc/Des
 
 ```
 $> embeddings image --help
-OVERVIEW: Parse the text of a wall label in to JSON-encoded structured data.
+OVERVIEW: Derive vector embeddings for an image.
 
 USAGE: embeddings image [--encoder_uri <encoder_uri>] --path <path> [--verbose <verbose>]
 
 OPTIONS:
   --encoder_uri <encoder_uri>
-                          The parser scheme is to use for parsing wall label text. (default: s0://)
-  --path <path>           The path to the image to derive embeddings for.
+                          The URI for MobileCLIP encoder to use. URIs take the form of {SCHEME}://{OPTIONAL_PATH} where {SCHEME} is one of s0,s1,s2 or blt and {OPTIONAL_PATH} is the path to a local
+                          directory containing compiled MobileCLIP CoreML model files. If {OPTIONAL_PATH} is empty then models will loaded from the application's default Bundle. (default: s0://)
+  --path <path>           The path to the image to derive embeddings from.
   --verbose <verbose>     Enable verbose logging (default: false)
   -h, --help              Show help information.
 ```
@@ -83,5 +156,6 @@ $> embeddings image --encoder_uri=blt:///path/to/Models --path test21.png
 
 ## See also
 
-* https://github.com/apple/ml-mobileclip/tree/main
+* https://github.com/apple/ml-mobileclip
+* https://huggingface.co/apple/coreml-mobileclip
 * https://huggingface.co/apple/MobileCLIP2-B

@@ -33,13 +33,10 @@ private func newEmbeddings(encoder: CLIPEncoder, type: String, mlMultiArray: MLM
 
 private func convertToArray(from mlMultiArray: MLMultiArray) -> [Double] {
     
-    // Init our output array
     var array: [Double] = []
     
-    // Get length
     let length = mlMultiArray.count
     
-    // Set content of multi array to our out put array
     for i in 0...length - 1 {
         array.append(Double(truncating: mlMultiArray[[0,NSNumber(value: i)]]))
     }
