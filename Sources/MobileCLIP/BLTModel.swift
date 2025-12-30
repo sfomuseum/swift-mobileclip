@@ -11,6 +11,7 @@ public struct BLTModel: CLIPEncoder {
     
     public init() throws  {
         
+        
         do {
             text_model = try mobileclip_blt_text()
             image_model = try mobileclip_blt_image()

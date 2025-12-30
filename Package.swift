@@ -30,7 +30,8 @@ let package = Package(
         .target(
             name: "MobileCLIP",
             resources: [
-                .process("Resources")
+                .process("Resources/clip-merges.txt"),
+                .process("Resources/clip-vocab.json"),
             ],
         ),
         .executableTarget(
@@ -41,7 +42,10 @@ let package = Package(
                 .product(name: "Logging", package: "swift-log"),
             ],
             resources: [
-                .copy("../MobileCLIP/Models"),
+                .process("../MobileCLIP/Resources/clip-merges.txt"),
+                .process("../MobileCLIP/Resources/clip-vocab.json"),
+                .copy("Resources/mobileclip_s2_image.mlmodelc"),
+                .copy("Resources/mobileclip_s2_text.mlmodelc"),
             ]
         ),
     ]

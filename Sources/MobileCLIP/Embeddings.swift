@@ -73,7 +73,10 @@ public func ComputeTextEmbeddings(encoder: CLIPEncoder, tokenizer: CLIPTokenizer
 
 public func ComputeImageEmbeddings(encoder: CLIPEncoder, image: CGImage) async -> Result<Embeddings, Error> {
     
+    print("COMPUTE 1")
     let im = cgImageResizePreservingAspectRatio(image, toFit: encoder.targetImageSize)!
+    
+    print("COMPUTE 2")
     
     let extent = CGRect(x: 0,
                         y: 0,
@@ -86,14 +89,17 @@ public func ComputeImageEmbeddings(encoder: CLIPEncoder, image: CGImage) async -
     
     CVPixelBufferCreate(nil, Int(extent.width), Int(extent.height), pixelFormat, nil, &output)
 
+    print("COMPUTE 3")
     guard let output else {
         return .failure(EmbeddingsErrors.pixelBufferError)
     }
     
+    print("COMPUTE 4")
     if !render(cgImage: im, into: output) {
         return .failure(EmbeddingsErrors.imageRenderError)
     }
 
+    print("GO")
     let rsp = await encoder.encode(image: output)
     
     switch rsp {

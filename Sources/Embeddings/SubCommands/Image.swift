@@ -27,12 +27,16 @@ struct Image: AsyncParsableCommand {
         var encoder: CLIPEncoder
 
         do {
+            print("IM")
             im = try loadCGImage(at: path)
+            print("ENC")
             encoder = try NewClipEncoder(uri: encoder_uri)
+            print("POO")
         } catch {
             throw error
         }
 
+        print("COMPUTE \(encoder) \(im)")
         let rsp =  await ComputeImageEmbeddings(encoder: encoder, image: im)
 
         switch rsp {

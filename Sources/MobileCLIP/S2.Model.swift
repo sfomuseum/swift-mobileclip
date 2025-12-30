@@ -13,23 +13,34 @@ public struct S2Model: CLIPEncoder {
     public init() throws  {
         
         do {
+            print("HELLO")
             text_model = try mobileclip_s2_text()
+            print("WORLD")
             image_model = try mobileclip_s2_image()
         } catch {
             throw error
         }
+        print("YO")
     }
     
     public func encode(image: CVPixelBuffer) async -> Result<MLMultiArray, Error> {
 
+        print("OMGWTF 1")
         do {
             
+            print("OMGWTF 2")
+
             guard let model = self.image_model else {
                 throw CLIPEncoderError.missingModel
             }
             
+            print("OMGWTF 3")
             let rsp = try model.prediction(image: image).final_emb_1
-            return .success(rsp)
+            
+            print("OMGWTF 4")
+            
+
+            return .success (rsp)
         } catch {
             return .failure(error)
         }
