@@ -81,7 +81,6 @@ public struct Embeddings: Codable {
     var model: String
     var type: String
     var created: Int64
-
 }
 ```
 
@@ -105,10 +104,10 @@ OPTIONS:
   -h, --help              Show help information.
 
 SUBCOMMANDS:
-  text (default)          Parse the text of a wall label in to JSON-encoded structured data.
-  image                   Parse the text of a wall label in to JSON-encoded structured data.
+  text (default)          Derive vector embeddings for a text.
+  image                   Derive vector embeddings for an image.
 
-  See 'embeddings help <subcommand>' for detailed help
+  See 'embeddings help <subcommand>' for detailed help.
 ```
 
 #### embeddings text
