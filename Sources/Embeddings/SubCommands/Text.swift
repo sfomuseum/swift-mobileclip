@@ -9,9 +9,9 @@ enum TextErrors: Error {
 }
 
 struct Text: AsyncParsableCommand {
-    static let configuration = CommandConfiguration(abstract: "Parse the text of a wall label in to JSON-encoded structured data.")
+    static let configuration = CommandConfiguration(abstract: "Derive vector embeddings for a text.")
     
-    @Option(help: "The parser scheme is to use for parsing wall label text.")
+    @Option(help: "The URI for MobileCLIP encoder to use. URIs take the form of {SCHEME}://{OPTIONAL_PATH} where {SCHEME} is one of s0,s1,s2 or blt and {OPTIONAL_PATH} is the path to a local directory containing compiled MobileCLIP CoreML model files. If {OPTIONAL_PATH} is empty then models will loaded from the application's default Bundle.")
     var encoder_uri: String = "s0://"
     
     @Option(help: "Enable verbose logging")
