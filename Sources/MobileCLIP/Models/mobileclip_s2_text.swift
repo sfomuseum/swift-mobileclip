@@ -73,11 +73,11 @@ class mobileclip_s2_textOutput : MLFeatureProvider {
 @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 class mobileclip_s2_text {
     let model: MLModel
-	
+
     /// URL of model assuming it was installed in the same bundle as this class
     class var urlOfModelInThisBundle : URL {
-    let bundle = Bundle(for: self)
-           return bundle.url(forResource: "mobileclip_s2_text", withExtension:"mlmodelc")!
+        let bundle = Bundle(for: self)
+        return bundle.url(forResource: "mobileclip_s2_text", withExtension:"mlmodelc")!
     }
 
     /**
@@ -90,9 +90,7 @@ class mobileclip_s2_text {
           - model: MLModel object
     */
     init(model: MLModel) {
-    		print("INIT MODEL")
         self.model = model
-	print("BUELLER")
     }
 
     /**
@@ -104,14 +102,7 @@ class mobileclip_s2_text {
         - throws: an NSError object that describes the problem
     */
     convenience init(configuration: MLModelConfiguration = MLModelConfiguration()) throws {
-    		print("INIT CONFIG")
-
-		guard let url = URL(string: "file:///Users/asc/sfomuseum/swift-mobileclip/Sources/Embeddings/Resources/mobileclip_s2_text.mlmodelc") else {
-		      fatalError("SAD")
-		      }
-		
-        // try self.init(contentsOf: type(of:self).urlOfModelInThisBundle, configuration: configuration)
-        try self.init(contentsOf: url, configuration: configuration)	
+        try self.init(contentsOf: type(of:self).urlOfModelInThisBundle, configuration: configuration)
     }
 
     /**
@@ -122,7 +113,6 @@ class mobileclip_s2_text {
         - throws: an NSError object that describes the problem
     */
     convenience init(contentsOf modelURL: URL) throws {
-    		print("INIT URK")    
         try self.init(model: MLModel(contentsOf: modelURL))
     }
 
@@ -136,7 +126,6 @@ class mobileclip_s2_text {
         - throws: an NSError object that describes the problem
     */
     convenience init(contentsOf modelURL: URL, configuration: MLModelConfiguration) throws {
-    		print("INIT URL CONFIG \(modelURL)")
         try self.init(model: MLModel(contentsOf: modelURL, configuration: configuration))
     }
 
@@ -230,7 +219,6 @@ class mobileclip_s2_text {
         - returns: the result of the prediction as mobileclip_s2_textOutput
     */
     func prediction(input: mobileclip_s2_textInput, options: MLPredictionOptions) throws -> mobileclip_s2_textOutput {
-    print("PREDICY OPTS")
         let outFeatures = try model.prediction(from: input, options: options)
         return mobileclip_s2_textOutput(features: outFeatures)
     }

@@ -88,12 +88,8 @@ class mobileclip_s2_image {
 
     /// URL of model assuming it was installed in the same bundle as this class
     class var urlOfModelInThisBundle : URL {
-        // let bundle = Bundle(for: self)
-        // return bundle.url(forResource: "mobileclip_s2_image", withExtension:"mlmodelc")!
-
-	let wtf = Bundle.module.url(forResource: "Resources/mobileclip_s2_image", withExtension:"mlmodelc")
-	print("IMG \(wtf)")
-        return Bundle.module.url(forResource: "mobileclip_s2_image", withExtension:"mlmodelc")!    
+        let bundle = Bundle(for: self)
+        return bundle.url(forResource: "mobileclip_s2_image", withExtension:"mlmodelc")!
     }
 
     /**
@@ -118,14 +114,7 @@ class mobileclip_s2_image {
         - throws: an NSError object that describes the problem
     */
     convenience init(configuration: MLModelConfiguration = MLModelConfiguration()) throws {
-        // try self.init(contentsOf: type(of:self).urlOfModelInThisBundle, configuration: configuration)
-
-		guard let url = URL(string: "file:///Users/asc/sfomuseum/swift-mobileclip/Sources/Embeddings/Resources/mobileclip_s2_image.mlmodelc") else {
-		      fatalError("SAD")
-		      }
-
-		      print("WOO")
-        try self.init(contentsOf: url, configuration: configuration)	
+        try self.init(contentsOf: type(of:self).urlOfModelInThisBundle, configuration: configuration)
     }
 
     /**

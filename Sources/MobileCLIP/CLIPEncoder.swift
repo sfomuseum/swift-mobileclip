@@ -20,13 +20,15 @@ public func NewClipEncoder(uri: String) throws -> CLIPEncoder {
         throw CLIPEncoderError.invalidURI
     }
     
+    print("PATH \(u.path)")
+    
     switch u.scheme {
     case "s0":
         return try S0Model()
     case "s1":
         return try S1Model()
     case "s2":
-        return try S2Model()
+        return try S2Model(u.path)
     case "blt":
         return try BLTModel()
     default:

@@ -10,14 +10,38 @@ public struct S2Model: CLIPEncoder {
     private var text_model: mobileclip_s2_text?
     private var image_model: mobileclip_s2_image?
     
-    public init() throws  {
+    public init(_ root: String = "") throws  {
         
         do {
-            print("HELLO")
-            text_model = try mobileclip_s2_text()
-            print("WORLD")
-            image_model = try mobileclip_s2_image()
+            
+            if root != "" {
+                
+                let root_uri = String(format: "file://%@", root)
+                guard var im_model = URL(string: root_uri) else {
+                    print("SAD IM \(root_uri)")
+                    fatalError()
+                }
+           
+                guard var txt_model = URL(string: root_uri) else {
+                    print("SAD TXT")
+                    fatalError()
+                }
+                
+                im_model.append(path: "mobileclip_s2_image.mlmodelc")
+                txt_model.append(path: "mobileclip_s2_text.mlmodelc")
+                
+                print("im \(im_model.absoluteString) txt: \(txt_model.absoluteString)")
+                image_model = try mobileclip_s2_image(contentsOf: im_model)
+                text_model = try mobileclip_s2_text(contentsOf: txt_model)
+                
+            } else {
+                
+                text_model = try mobileclip_s2_text()
+                image_model = try mobileclip_s2_image()
+            }
+            
         } catch {
+            print("SAD SAD ERROR")
             throw error
         }
         print("YO")
