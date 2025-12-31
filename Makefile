@@ -17,3 +17,13 @@ compile:
 generate:
 	xcrun coremlcompiler generate $(SOURCE)/mobileclip_$(MODEL)_image.mlpackage Sources/MobileCLIP/Models --language Swift
 	xcrun coremlcompiler generate $(SOURCE)/mobileclip_$(MODEL)_text.mlpackage Sources/MobileCLIP/Models --language Swift
+
+protoc:
+	protoc Sources/Protos/embeddings/embeddings.proto \
+		--proto_path=Sources/Protos/ \
+		--plugin=/opt/homebrew/bin/protoc-gen-swift \
+		--swift_opt=Visibility=Public \
+		--swift_out=Sources/ImageEmbosser/ \
+		--plugin=/opt/homebrew/bin/protoc-gen-grpc-swift \
+		--grpc-swift_opt=Visibility=Public \
+		--grpc-swift_out=Sources/ImageEmbosser/
