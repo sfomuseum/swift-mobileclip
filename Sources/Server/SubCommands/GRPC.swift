@@ -5,6 +5,8 @@ import MobileCLIP
 import GRPCCore
 import GRPCNIOTransportHTTP2
 import GRPCProtobuf
+import CoreGraphics
+import CoreGraphicsImage
 
 struct gRPCServer: AsyncParsableCommand {
     static let configuration = CommandConfiguration(abstract: "Derive vector embeddings for a text.")
@@ -75,6 +77,16 @@ struct gRPCServer: AsyncParsableCommand {
               }
         )
 
+        let tokenizer = CLIPTokenizer()
+        var encoder: CLIPEncoder
+        
+        do {
+            encoder = try NewClipEncoder(uri: encoder_uri)
+        } catch {
+            logger.error("Failed to create new encoder, \(error)")
+            throw error
+        }
+        
         // let service = ImageEmbosserService(logger: logger)
         let server = GRPCServer(transport: transport, services: [])
                 
@@ -85,4 +97,14 @@ struct gRPCServer: AsyncParsableCommand {
             group.addTask { try await server.serve() }
         }
     }
+}
+
+struct EmbeddingsService: OrgSfomuseumEmbeddingsService_EmbeddingsService.SimpleServiceProtocol {
+    
+    var logger: Logger
+    
+    init(logger: Logger) {
+        self.logger = logger
+    }
+    
 }

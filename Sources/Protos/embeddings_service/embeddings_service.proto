@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package org_sfomuseum_embeddings_service;
+
+service EmbeddingsService {
+    rpc ComputeTextEmbeddings(EmbeddingsRequest) returns (EmbeddingsResponse) {}
+    rpc ComputeImageEmbeddings(EmbeddingsRequest) returns (EmbeddingsResponse) {}
+}
+
+message EmbeddingsRequest {
+    string Id = 1;
+    string Model = 2;
+    bytes Body = 3;
+}
+
+message EmbeddingsResponse {
+    string Id = 1;
+    string Model = 2;
+    int32 Dimensions = 3;
+    repeated float Embeddings = 4;
+    int64 Created = 5;
+}

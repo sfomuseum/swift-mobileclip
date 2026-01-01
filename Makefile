@@ -18,12 +18,12 @@ generate:
 	xcrun coremlcompiler generate $(SOURCE)/mobileclip_$(MODEL)_image.mlpackage Sources/MobileCLIP/Models --language Swift
 	xcrun coremlcompiler generate $(SOURCE)/mobileclip_$(MODEL)_text.mlpackage Sources/MobileCLIP/Models --language Swift
 
+# https://swiftpackageindex.com/grpc/grpc-swift-protobuf/2.1.2/documentation/grpcprotobuf/code-generation-with-protoc
+
 protoc:
-	protoc Sources/Protos/embeddings/embeddings.proto \
-		--proto_path=Sources/Protos/ \
-		--plugin=/opt/homebrew/bin/protoc-gen-swift \
+	protoc \
+		--swift_out=. \
 		--swift_opt=Visibility=Public \
-		--swift_out=Sources/ImageEmbosser/ \
-		--plugin=/opt/homebrew/bin/protoc-gen-grpc-swift \
-		--grpc-swift_opt=Visibility=Public \
-		--grpc-swift_out=Sources/ImageEmbosser/
+		--grpc-swift-2_out=. \
+		--grpc-swift-2_opt=Visibility=Public \
+		Sources/Protos/embeddings_service/embeddings_service.proto
