@@ -4,6 +4,7 @@ import Logging
 import GRPCCore
 import GRPCNIOTransportHTTP2
 import Logging
+import SwiftProtobuf
 
 struct Image: AsyncParsableCommand {
     static let configuration = CommandConfiguration(abstract: "...")
@@ -58,13 +59,10 @@ struct Image: AsyncParsableCommand {
             
             let rsp = try await server.computeImageEmbeddings(req)
             
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .sortedKeys
-            
             do {
-                let data = try encoder.encode(rsp.embeddings)
-                FileHandle.standardOutput.write(data)
+                try writeResponseAsJSON(rsp: rsp)
             } catch {
+                logger.error("Failed to marshal response \(error)")
                 throw error
             }
         }

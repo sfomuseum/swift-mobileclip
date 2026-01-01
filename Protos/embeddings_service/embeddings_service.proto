@@ -8,15 +8,15 @@ service EmbeddingsService {
 }
 
 message EmbeddingsRequest {
-    string Id = 1;
-    string Model = 2;
-    bytes Body = 3;
+    string id = 1;
+    string model = 2;
+    bytes body = 3;
 }
 
 message EmbeddingsResponse {
-    string Id = 1;
-    string Model = 2;
-    int32 Dimensions = 3;
-    repeated float Embeddings = 4;
-    int64 Created = 5;
+    string id = 1;
+    string model = 2;
+    int32 dimensions = 3;
+    repeated float embeddings = 4;
+    int64 created = 5;
 }

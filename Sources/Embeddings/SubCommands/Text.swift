@@ -38,6 +38,7 @@ struct Text: AsyncParsableCommand {
         do {
             input = try TextFromArgs(args: args)
         } catch {
+            logger.error("Failed to derive input text from args \(error)")
             throw error
         }
         

@@ -29,7 +29,7 @@ struct Text: AsyncParsableCommand {
     
     func run() async throws {
         
-        var logger = Logger(label: "org.sfomuseum.embeddings.grpc.image")
+        var logger = Logger(label: "org.sfomuseum.embeddings.grpc.text")
 
         if verbose {
             logger.logLevel = .debug
@@ -51,6 +51,7 @@ struct Text: AsyncParsableCommand {
             do {
                  input = try TextFromArgsAsData(args: args)
             } catch {
+                logger.error("Failed to derive text from args \(error)")
                 throw error
             }
             
@@ -63,13 +64,10 @@ struct Text: AsyncParsableCommand {
 
             let rsp = try await server.computeTextEmbeddings(req)
             
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .sortedKeys
-            
             do {
-                let data = try encoder.encode(rsp.embeddings)
-                FileHandle.standardOutput.write(data)
+                try writeResponseAsJSON(rsp: rsp)
             } catch {
+                logger.error("Failed to marshal response \(error)")
                 throw error
             }
         }
