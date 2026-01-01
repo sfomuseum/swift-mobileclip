@@ -9,14 +9,15 @@ import CoreGraphics
 import CoreGraphicsImage
 
 enum ServeError: Error {
+    case invalidEncoderURI
     case invalidText
 }
 
 struct Serve: AsyncParsableCommand {
     static let configuration = CommandConfiguration(abstract: "Derive vector embeddings for a text.")
     
-    @Option(help: "The URI for MobileCLIP encoder to use. URIs take the form of {SCHEME}://{OPTIONAL_PATH} where {SCHEME} is one of s0,s1,s2 or blt and {OPTIONAL_PATH} is the path to a local directory containing compiled MobileCLIP CoreML model files. If {OPTIONAL_PATH} is empty then models will loaded from the application's default Bundle.")
-    var encoder_uri: String = "s0://"
+    @Option(help: "...")
+    var models: String = ""
     
     @Option(help: "The host name to listen for new connections")
     var host: String = "127.0.0.1"
@@ -38,7 +39,7 @@ struct Serve: AsyncParsableCommand {
     
     func run() async throws {
         
-        var logger = Logger(label: "org.sfomuseum.embeddings.text")
+        var logger = Logger(label: "org.sfomuseum.embeddings.grpc.server")
 
         if verbose {
             logger.logLevel = .debug
@@ -87,7 +88,7 @@ struct Serve: AsyncParsableCommand {
               }
         )
         
-        let service = EmbeddingsService(encoder_uri: encoder_uri, logger: logger)
+        let service = EmbeddingsService(models: models, logger: logger)
         let server = GRPCServer(transport: transport, services: [service])
                 
         try await withThrowingDiscardingTaskGroup { group in
@@ -102,22 +103,47 @@ struct Serve: AsyncParsableCommand {
 struct EmbeddingsService: OrgSfomuseumEmbeddingsService_EmbeddingsService.SimpleServiceProtocol {
     
     var logger: Logger
-    var encoder_uri: String
+    var models: String
     
-    init(encoder_uri: String, logger: Logger) {
+    // Fails all the Sendable checks...
+    // var encoders: [String: CLIPEncoder] = [:]
+    
+    init(models: String, logger: Logger) {
         self.logger = logger
-        self.encoder_uri = encoder_uri
+        self.models = models
     }
 
+    func newEncoder(model: String) throws -> CLIPEncoder {
+        
+        var components = URLComponents()
+        components.scheme = model
+        
+        if self.models != "" {
+            components.path = self.models
+        }
+        
+        guard let encoder_uri = components.url else {
+            throw ServeError.invalidEncoderURI
+        }
+        
+        logger.info("Create encoder for \(encoder_uri.absoluteString)")
+        
+        do {
+            return try NewClipEncoder(uri: encoder_uri.absoluteString)
+        } catch {
+            logger.error("Failed to create new encoder, \(error)")
+            throw error
+        }
+    }
+    
     func computeImageEmbeddings(request: OrgSfomuseumEmbeddingsService_EmbeddingsRequest, context: GRPCCore.ServerContext) async throws -> OrgSfomuseumEmbeddingsService_EmbeddingsResponse {
         
         var encoder: CLIPEncoder
         var im: CGImage
 
         do {
-            encoder = try NewClipEncoder(uri: self.encoder_uri)
+            encoder = try self.newEncoder(model: request.model)
         } catch {
-            logger.error("Failed to create new encoder, \(error)")
             throw error
         }
 
@@ -177,9 +203,8 @@ struct EmbeddingsService: OrgSfomuseumEmbeddingsService_EmbeddingsService.Simple
         var encoder: CLIPEncoder
         
         do {
-            encoder = try NewClipEncoder(uri: self.encoder_uri)
+            encoder = try self.newEncoder(model: request.model)
         } catch {
-            logger.error("Failed to create new encoder, \(error)")
             throw error
         }
 

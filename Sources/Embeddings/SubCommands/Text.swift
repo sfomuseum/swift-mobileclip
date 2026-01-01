@@ -3,11 +3,6 @@ import Foundation
 import Logging
 import MobileCLIP
 
-enum TextErrors: Error {
-    case missingInput
-    case isDirectory
-}
-
 struct Text: AsyncParsableCommand {
     static let configuration = CommandConfiguration(abstract: "Derive vector embeddings for a text.")
     
@@ -40,47 +35,10 @@ struct Text: AsyncParsableCommand {
            
         var input: String = ""
         
-        switch args.count {
-        case 0:
-            throw TextErrors.missingInput
-        case 1:
-            
-            switch args[0] {
-            case "-":
-                
-                let data = FileHandle.standardInput.readDataToEndOfFile()
-                input = String(data: data, encoding: .utf8) ?? ""
-                
-            default:
-                
-                var isDir: ObjCBool = false
-                let exists = FileManager.default.fileExists(atPath: args[0], isDirectory: &isDir)
-                
-                if !exists {
-                    input = args[0]
-                } else {
-                                        
-                    if isDir.boolValue {
-                        logger.error("Path is a directory")
-                        throw TextErrors.isDirectory
-                    }
-                    
-                    do {
-                        input = try String(contentsOfFile: args[0], encoding: .utf8)
-                    } catch {
-                        logger.error("Failed to read file, \(error)")
-                        throw error
-                    }
-                }
-
-            }
-            
-        default:
-            input = args.joined(separator: " ")
-        }
-                
-        guard input != "" else {
-            throw TextErrors.missingInput
+        do {
+            input = try TextFromArgs(args: args)
+        } catch {
+            throw error
         }
         
         let rsp = await ComputeTextEmbeddings(encoder: encoder, tokenizer: tokenizer, text: input)

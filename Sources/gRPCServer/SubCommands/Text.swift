@@ -4,8 +4,9 @@ import Logging
 import GRPCCore
 import GRPCNIOTransportHTTP2
 import Logging
+import MobileCLIP
 
-struct Client: AsyncParsableCommand {
+struct Text: AsyncParsableCommand {
     static let configuration = CommandConfiguration(abstract: "...")
     
     @Option(help: "The host name for the gRPC server.")
@@ -14,21 +15,21 @@ struct Client: AsyncParsableCommand {
     @Option(help: "The port for the gRPC server.")
     var port: Int = 8080
     
+    @Option(help: "...")
+    var model: String = "s0"
+    
     // @Option(help: "Log events to system log files")
     // var logfile: Bool = false
     
     @Option(help: "Enable verbose logging")
     var verbose: Bool = false
     
-    @Option(help: "The image file to derive embeddings for.")
-    var image: String
-    
-    @Option(help: "Display this message.")
-    var combined: Bool = false
+    @Argument(help: "The text to generate embeddings for. If \"-\" then data is read from STDIN. If the first argument is a valid path to a local file then the text of that file will be used. Otherwise all remaining arguments will be concatenated (with a space) and used as the text to generate embeddings for.")
+    var args: [String]
     
     func run() async throws {
         
-        var logger = Logger(label: "org.sfomuseum.embeddings.grpc.client")
+        var logger = Logger(label: "org.sfomuseum.embeddings.grpc.image")
 
         if verbose {
             logger.logLevel = .debug
@@ -43,19 +44,24 @@ struct Client: AsyncParsableCommand {
             
         ) { client in
             
-            let image_url = URL(filePath: image)
-            let image_basename = image_url.lastPathComponent
-            let body = try Data(contentsOf: image_url)
-                        
-            logger.info("Derive image embeddings \(image_basename)")
+            logger.info("Derive text embeddings")
             
-            let server = OrgSfomuseumEmbeddingsService_EmbeddingsService.Client(wrapping: client)
+            var input: Data
+            
+            do {
+                 input = try TextFromArgsAsData(args: args)
+            } catch {
+                throw error
+            }
             
             var req = OrgSfomuseumEmbeddingsService_EmbeddingsRequest()
-            req.id = image_basename
-            req.body = body
+            req.id = ""
+            req.model = model
+            req.body = input
             
-            let rsp = try await server.computeImageEmbeddings(req)
+            let server = OrgSfomuseumEmbeddingsService_EmbeddingsService.Client(wrapping: client)
+
+            let rsp = try await server.computeTextEmbeddings(req)
             
             let encoder = JSONEncoder()
             encoder.outputFormatting = .sortedKeys
