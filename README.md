@@ -163,6 +163,84 @@ $> embeddings image --encoder_uri=blt:///path/to/Models --path test21.png
 {"created":1767126429,"dimensions":512,"embeddings":[0.052520751953125,-0.127685546875,-0.34765625,0.23779296875,0.409912109375,0.023956298828125,0.62109375,-0.141845703125,-0.0167388916015625,-0.0132293701171875,-0.0684814453125,0.48583984375,-0.29931640625,0.184326171875,-0.0176544189453125,-0.196533203125,0.431884765625,-0.254638671875,0.02398681640625,-0.1324462890625,0.260986328125,0.36669921875,0.1402587890625,-0.390625,0.69970703125,-0.44189453125,-0.1728515625,-0.137451171875,0.35302734375,0.174 ... and so on
 ```
 
+### embeddings-grpcd
+
+```
+$> embeddings-grpcd -h
+USAGE: server <subcommand>
+
+OPTIONS:
+  -h, --help              Show help information.
+
+SUBCOMMANDS:
+  serve (default)         gRPC server for deriving vector embeddings from an image or text.
+  image                   gRPC client to derive vector embeddings for an image.
+  text                    gRPC client to derive vector embeddings for a text.
+
+  See 'server help <subcommand>' for detailed help.
+```
+
+#### embeddings-grpcd serve
+
+```
+$> embeddings-grpcd serve -h
+OVERVIEW: gRPC server for deriving vector embeddings from an image or text.
+
+USAGE: server serve [--models <models>] [--host <host>] [--port <port>] [--max_receive_message_length <max_receive_message_length>] [--tls_certificate <tls_certificate>] [--tls_key <tls_key>] [--verbose <verbose>]
+
+OPTIONS:
+  --models <models>       The path to the directory containing the MobileCLIP ".modelc" files. If empty then it will be assumed that those models have been bundled as application resources and will
+                          be available from the main "Bundle".
+  --host <host>           The host name to listen for new connections (default: 127.0.0.1)
+  --port <port>           The port to listen on (default: 8080)
+  --max_receive_message_length <max_receive_message_length>
+                          Sets the maximum message size in bytes the server may receive. If 0 then the swift-grpc defaults will be used. (default: 0)
+  --tls_certificate <tls_certificate>
+                          The TLS certificate chain to use for encrypted connections
+  --tls_key <tls_key>     The TLS private key to use for encrypted connections
+  --verbose <verbose>     Enable verbose logging (default: false)
+  -h, --help              Show help information.
+```
+
+#### embeddings-grpcd text
+
+```
+$> embeddings-grpcd text -h
+OVERVIEW: gRPC client to derive vector embeddings for a text.
+
+USAGE: server text [--host <host>] [--port <port>] [--model <model>] [--verbose <verbose>] <args> ...
+
+ARGUMENTS:
+  <args>                  The text to generate embeddings for. If "-" then data is read from STDIN. If the first argument is a valid path to a local file then the text of that file will be used.
+                          Otherwise all remaining arguments will be concatenated (with a space) and used as the text to generate embeddings for.
+
+OPTIONS:
+  --host <host>           The host name for the gRPC server. (default: 127.0.0.1)
+  --port <port>           The port for the gRPC server. (default: 8080)
+  --model <model>         The name of the model to use when generating embeddings. Valid options are: s0, s1, s2, blt. (default: s0)
+  --verbose <verbose>     Enable verbose logging (default: false)
+  -h, --help              Show help information.
+```
+
+#### embeddings-grpcd image
+
+```
+$> embeddings-grpcd image -h
+OVERVIEW: gRPC client to derive vector embeddings for an image.
+
+USAGE: server image [--host <host>] [--port <port>] [--model <model>] [--verbose <verbose>] --image <image>
+
+OPTIONS:
+  --host <host>           The host name for the gRPC server. (default: 127.0.0.1)
+  --port <port>           The port for the gRPC server. (default: 8080)
+  --model <model>         The name of the model to use when generating embeddings. Valid options are: s0, s1, s2, blt. (default: s0)
+  --verbose <verbose>     Enable verbose logging (default: false)
+  --image <image>         The image file to derive embeddings for.
+  -h, --help              Show help information.
+```
+
+## Known-knowns
+
 ## See also
 
 * https://github.com/apple/ml-mobileclip

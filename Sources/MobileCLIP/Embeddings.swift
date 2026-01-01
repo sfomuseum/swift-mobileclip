@@ -1,10 +1,21 @@
 import CoreML
 import Foundation
 
-public enum EmbeddingsErrors: Error {
+public enum EmbeddingsErrors: Error, LocalizedError {
     case pixelBufferError
     case imageResizeError
     case imageRenderError
+    
+    public var errorDescription: String? {
+        switch self {
+        case .pixelBufferError:
+            return "Failed to CVPixelBufferCreate."
+        case .imageResizeError:
+            return "Failed to resize image."
+        case .imageRenderError:
+            return "Failed to render image."
+        }
+    }
 }
 
 public struct Embeddings: Codable {

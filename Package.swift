@@ -20,7 +20,7 @@ let package = Package(
                 "Embeddings"
             ]),
         .executable(
-            name: "grpc-server",
+            name: "embeddings-grpcd",
             targets: [
                 "gRPCServer"
             ])

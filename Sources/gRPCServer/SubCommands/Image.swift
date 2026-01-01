@@ -7,7 +7,7 @@ import Logging
 import SwiftProtobuf
 
 struct Image: AsyncParsableCommand {
-    static let configuration = CommandConfiguration(abstract: "...")
+    static let configuration = CommandConfiguration(abstract: "gRPC client to derive vector embeddings for an image.")
     
     @Option(help: "The host name for the gRPC server.")
     var host: String = "127.0.0.1"
@@ -15,11 +15,8 @@ struct Image: AsyncParsableCommand {
     @Option(help: "The port for the gRPC server.")
     var port: Int = 8080
     
-    @Option(help: "...")
+    @Option(help: "The name of the model to use when generating embeddings. Valid options are: s0, s1, s2, blt.")
     var model: String = "s0"
-    
-    // @Option(help: "Log events to system log files")
-    // var logfile: Bool = false
     
     @Option(help: "Enable verbose logging")
     var verbose: Bool = false

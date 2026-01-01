@@ -2,10 +2,21 @@ import CoreGraphics
 import CoreImage
 import Foundation
 
-enum CGImageError: Error {
+enum CGImageError: Error, LocalizedError {
     case notExists
     case sourceCreate
     case sourceCreateIndex
+    
+    public var errorDescription: String? {
+        switch self {
+        case .notExists:
+            return "Image not found."
+        case .sourceCreate:
+            return "Failed to create CGImageSourceCreateWithURL"
+        case .sourceCreateIndex:
+            return "Failed to create CGImageSourceCreateImageAtIndex."
+        }
+    }
 }
 
 public func loadCGImage(at path: String) throws -> CGImage {

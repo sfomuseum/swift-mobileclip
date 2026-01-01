@@ -9,6 +9,7 @@
 import CoreGraphics
 
 struct ImageScaler {
+    
     static func scaleToFill(_ image: CGImage, from fromRect: CGRect = .zero, in targetSize: CGSize) -> CGImage? {
         let imageSize = CGSize(width: image.width, height: image.height)
         let rect = fromRect.isEmpty ? CGRect(origin: .zero, size: imageSize) : fromRect

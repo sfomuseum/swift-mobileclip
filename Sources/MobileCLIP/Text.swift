@@ -4,6 +4,17 @@ enum TextErrors: Error {
     case missingInput
     case isDirectory
     case dataConversion
+    
+    public var errorDescription: String? {
+        switch self {
+        case .missingInput:
+            return "No text to work with."
+        case .isDirectory:
+            return "Path to file is a directory."
+        case .dataConversion:
+            return "Failed to convert text (String) to Data."
+        }
+    }
 }
 
 public func TextFromArgsAsData(args: [String]) throws -> Data {

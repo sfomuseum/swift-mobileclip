@@ -1,11 +1,24 @@
 import Foundation
 import CoreML
 
-public enum CLIPEncoderError: Error {
+public enum CLIPEncoderError: Error, LocalizedError {
     case invalidURI
     case invalidComponents
     case invalidScheme
     case missingModel
+    
+    public var errorDescription: String? {
+        switch self {
+        case .invalidURI:
+            return "Failed to parse URI."
+        case .invalidComponents:
+            return "Failed to derive components from URI."
+        case .invalidScheme:
+            return "Invalid or unsupported URI scheme."
+        case .missingModel:
+            return "Failed to load model, not found."
+        }
+    }
 }
 
 public protocol CLIPEncoder {

@@ -8,15 +8,24 @@ import GRPCProtobuf
 import CoreGraphics
 import CoreGraphicsImage
 
-enum ServeError: Error {
+enum ServeError: Error, LocalizedError {
     case invalidEncoderURI
     case invalidText
+    
+    public var errorDescription: String? {
+        switch self {
+        case .invalidEncoderURI:
+            return "Failed to construct encoder URI from model(s)."
+        case .invalidText:
+            return "Input text is invalid."
+        }
+    }
 }
 
 struct Serve: AsyncParsableCommand {
-    static let configuration = CommandConfiguration(abstract: "Derive vector embeddings for a text.")
+    static let configuration = CommandConfiguration(abstract: "gRPC server for deriving vector embeddings from an image or text.")
     
-    @Option(help: "...")
+    @Option(help: "The path to the directory containing the MobileCLIP \".modelc\" files. If empty then it will be assumed that those models have been bundled as application resources and will be available from the main \"Bundle\".")
     var models: String = ""
     
     @Option(help: "The host name to listen for new connections")
