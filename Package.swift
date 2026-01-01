@@ -20,9 +20,9 @@ let package = Package(
                 "Embeddings"
             ]),
         .executable(
-            name: "server",
+            name: "grpc-server",
             targets: [
-                "Server"
+                "gRPCServer"
             ])
     ],
     dependencies: [
@@ -56,7 +56,7 @@ let package = Package(
             ]
         ),
         .executableTarget(
-            name: "Server",
+            name: "gRPCServer",
             dependencies: [
                 "MobileCLIP",
                 .product(name: "GRPCCore", package: "grpc-swift-2"),

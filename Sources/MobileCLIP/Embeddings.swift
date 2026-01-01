@@ -8,12 +8,11 @@ public enum EmbeddingsErrors: Error {
 }
 
 public struct Embeddings: Codable {
-    var embeddings: [Double] 
-    var dimensions: Int
-    var model: String
-    var type: String
-    var created: Int64
-
+    public var embeddings: [Float32]
+    public var dimensions: Int
+    public var model: String
+    public var type: String
+    public var created: Int64
 }
 
 private func newEmbeddings(encoder: CLIPEncoder, type: String, mlMultiArray: MLMultiArray) -> Embeddings {
@@ -31,14 +30,14 @@ private func newEmbeddings(encoder: CLIPEncoder, type: String, mlMultiArray: MLM
     return emb
 }
 
-private func convertToArray(from mlMultiArray: MLMultiArray) -> [Double] {
+private func convertToArray(from mlMultiArray: MLMultiArray) -> [Float32] {
     
-    var array: [Double] = []
+    var array: [Float32] = []
     
     let length = mlMultiArray.count
     
     for i in 0...length - 1 {
-        array.append(Double(truncating: mlMultiArray[[0,NSNumber(value: i)]]))
+        array.append(Float32(truncating: mlMultiArray[[0,NSNumber(value: i)]]))
     }
     
     return array

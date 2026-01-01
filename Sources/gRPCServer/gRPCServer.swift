@@ -2,10 +2,10 @@ import Foundation
 import ArgumentParser
 
 @main
-struct Server: AsyncParsableCommand {
+struct gRPCServer: AsyncParsableCommand {
   static let configuration = CommandConfiguration(
     commandName: "server",
-    subcommands: [gRPCServer.self ],
-    defaultSubcommand: gRPCServer.self,
+    subcommands: [Serve.self, Client.self ],
+    defaultSubcommand: Serve.self,
   )
 }

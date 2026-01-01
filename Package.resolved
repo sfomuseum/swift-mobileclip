@@ -1,5 +1,5 @@
 {
-  "originHash" : "de7dddd33d012eac5fbad1caa47507bdc1cbabc4dbc6b8b08f3017f021d14766",
+  "originHash" : "d715b7f695d65c0e25c45f85e8cf435382c3f2261981e4651c018b415bb52e8d",
   "pins" : [
     {
       "identity" : "grpc-swift-2",
@@ -92,12 +92,12 @@
       }
     },
     {
-      "identity" : "swift-coreimage-image",
+      "identity" : "swift-coregraphics-image",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sfomuseum/swift-coreimage-image.git",
+      "location" : "https://github.com/sfomuseum/swift-coregraphics-image.git",
       "state" : {
-        "revision" : "f4788377a03a9bf5bb5cb7bace732b70192941ab",
-        "version" : "1.1.0"
+        "revision" : "af97253c3aaa15903a9a264f37fc650769f1411c",
+        "version" : "1.0.1"
       }
     },
     {
