@@ -1,9 +1,10 @@
 import Foundation
 
-enum TextErrors: Error {
+public enum TextErrors: Error {
     case missingInput
     case isDirectory
     case dataConversion
+    case exceedsMaxLength
     
     public var errorDescription: String? {
         switch self {
@@ -13,8 +14,15 @@ enum TextErrors: Error {
             return "Path to file is a directory."
         case .dataConversion:
             return "Failed to convert text (String) to Data."
+        case .exceedsMaxLength:
+            return "Text exceeds current max length (of 77)."
         }
     }
+}
+
+public func AllowableMaxLength() -> Int {
+    // This is hardcoded in the models themselves. At least for now...
+    return 77
 }
 
 public func TextFromArgsAsData(args: [String]) throws -> Data {
@@ -77,6 +85,10 @@ public func TextFromArgs(args: [String]) throws -> String {
             
     guard body != "" else {
         throw TextErrors.missingInput
+    }
+        
+    if body.count > AllowableMaxLength() {
+        throw TextErrors.exceedsMaxLength
     }
     
     return body

@@ -135,12 +135,11 @@ struct EmbeddingsService: OrgSfomuseumEmbeddingsService_EmbeddingsService.Simple
             throw ServeError.invalidEncoderURI
         }
         
-        logger.info("Create encoder for \(encoder_uri.absoluteString)")
+        logger.debug("Create encoder for \(encoder_uri.absoluteString)")
         
         do {
             return try NewClipEncoder(uri: encoder_uri.absoluteString)
         } catch {
-            logger.error("Failed to create new encoder, \(error)")
             throw error
         }
     }
@@ -153,7 +152,8 @@ struct EmbeddingsService: OrgSfomuseumEmbeddingsService_EmbeddingsService.Simple
         do {
             encoder = try self.newEncoder(model: request.model)
         } catch {
-            throw error
+            logger.error("Failed to create encoder \(error)")
+            throw RPCError(code: .internalError, message: error.localizedDescription)
         }
 
         let temporaryDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory(),
@@ -180,7 +180,7 @@ struct EmbeddingsService: OrgSfomuseumEmbeddingsService_EmbeddingsService.Simple
         switch im_rsp {
         case .failure(let error):
             self.logger.error("Failed to load image from \(temporaryFileURL), \(error)")
-            throw(error)
+            throw RPCError(code: .internalError, message: error.localizedDescription)
         case .success(let cg_im):
             im = cg_im
         }
@@ -201,8 +201,8 @@ struct EmbeddingsService: OrgSfomuseumEmbeddingsService_EmbeddingsService.Simple
             return rsp
             
         case .failure(let error):
-            logger.error("Failed to encode embeddings, \(error)")
-            throw error
+            logger.error("Failed to derive embeddings, \(error)")
+            throw RPCError(code: .internalError, message: error.localizedDescription)
         }
     }
     
@@ -214,14 +214,20 @@ struct EmbeddingsService: OrgSfomuseumEmbeddingsService_EmbeddingsService.Simple
         do {
             encoder = try self.newEncoder(model: request.model)
         } catch {
-            throw error
+            logger.error("Failed to create encoder \(error)")
+            throw RPCError(code: .internalError, message: error.localizedDescription)
         }
 
         guard let text = String(data: request.body, encoding: .utf8) else {
             logger.error("Invalid message body")
-            throw ServeError.invalidText
+            throw RPCError(code: .invalidArgument, message: ServeError.invalidText.localizedDescription)
         }
 
+        if text.count > AllowableMaxLength() {
+            logger.error("Text exceed max length")
+            throw RPCError(code: .invalidArgument, message: TextErrors.exceedsMaxLength.localizedDescription)
+        }
+        
         let rsp = await ComputeTextEmbeddings(encoder: encoder, tokenizer: tokenizer, text: text)
         
         switch rsp {
@@ -238,8 +244,8 @@ struct EmbeddingsService: OrgSfomuseumEmbeddingsService_EmbeddingsService.Simple
             return rsp
             
         case .failure(let error):
-            logger.error("Failed to encode embeddings, \(error)")
-            throw error
+            logger.error("Failed to derive embeddings, \(error)")
+            throw RPCError(code: .internalError, message: error.localizedDescription)
         }
     }
     
