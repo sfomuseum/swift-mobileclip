@@ -9,3 +9,5 @@ DerivedData/
 *~
 *.mlmodelc
 .swiftpm
+build.sh
+dist
