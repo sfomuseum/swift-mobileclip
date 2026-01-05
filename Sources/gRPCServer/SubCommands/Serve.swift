@@ -48,7 +48,7 @@ struct Serve: AsyncParsableCommand {
     
     func run() async throws {
         
-        var logger = Logger(label: "org.sfomuseum.embeddings.grpc.server")
+        var logger = Logger(label: "org.sfomuseum.embeddings.grpcd")
 
         if verbose {
             logger.logLevel = .debug
@@ -103,7 +103,7 @@ struct Serve: AsyncParsableCommand {
         try await withThrowingDiscardingTaskGroup { group in
             // Why does this time out?
             // let address = try await transport.listeningAddress
-            logger.info("listening for requests on \(self.host):\(self.port)")
+            logger.info("listening for requests on \(self.host):\(self.port) (models:\(models))")
             group.addTask { try await server.serve() }
         }
     }
@@ -120,6 +120,8 @@ struct EmbeddingsService: OrgSfomuseumEmbeddingsService_EmbeddingsService.Simple
     init(models: String, logger: Logger) {
         self.logger = logger
         self.models = models
+        
+        logger.debug("Create new embeddings service with models \(models)")
     }
 
     func newEncoder(model: String) throws -> CLIPEncoder {
