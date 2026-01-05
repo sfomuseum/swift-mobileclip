@@ -43,10 +43,8 @@ public struct S2Model: CLIPEncoder {
             }
             
         } catch {
-            print("SAD SAD ERROR")
             throw error
         }
-        print("YO")
     }
     
     public func encode(image: CVPixelBuffer) async -> Result<MLMultiArray, Error> {
