@@ -10,6 +10,10 @@ Currently this code targets the [apple/coreml-mobileclip](https://huggingface.co
 
 There is a short list of "known knowns" or "gotchas" at the end of this document. Overall this package works as expected but there are a few circumstances where it won't (yet).
 
+## Background
+
+Please refer to the [Similar object images derived using the MobileCLIP computer-vision models](https://millsfield.sfomuseum.org/blog/2026/01/09/similar/) blog post.
+
 ## Models
 
 The MobileCLIP models weigh in at about ~750MB so they are NOT bundled with this package. The idea is that you will download them locally to the same host that is running the applications provided by this package.
